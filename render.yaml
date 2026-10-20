@@ -1,0 +1,19 @@
+# Render blueprint. New > Blueprint > pick this repo.
+# NOTE: Render's free plan has NO persistent disk, so data resets on every restart/deploy. That is fine for a
+# judged demo because TV_SEED_DEMO=1 re-creates the demo data on each boot. For real data use a paid plan
+# with a disk mounted at /data and remove TV_SEED_DEMO.
+services:
+  - type: web
+    name: trustvault
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TV_SECRET
+        generateValue: true      # keep it stable; changing it makes stored files unreadable
+      - key: TV_TRUST_PROXY
+        value: "1"               # Render terminates TLS and sets X-Forwarded-For
+      - key: TV_SEED_DEMO
+        value: "1"               # DEMO ONLY: public demo passwords. Remove for real use.
