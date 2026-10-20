@@ -19,13 +19,15 @@ function sendJson(res, status, body, headers = {}) {
   res.end(data);
 }
 
+const fmtLimit = (n) => (n >= 1048576 ? `${Math.round(n / 1048576)} MB` : n >= 1024 ? `${Math.round(n / 1024)} KB` : `${n} bytes`);
+
 /** Reads a body into a Buffer, refusing as soon as it exceeds `limit` bytes. */
 function readBody(req, limit) {
   return new Promise((resolve, reject) => {
     const declared = Number(req.headers['content-length']);
     if (Number.isFinite(declared) && declared > limit) {
       req.resume();
-      return reject(new HttpError(413, `Body too large (limit ${limit} bytes)`));
+      return reject(new HttpError(413, `File or request body is too large (limit ${fmtLimit(limit)})`));
     }
     const chunks = [];
     let size = 0;
@@ -33,7 +35,7 @@ function readBody(req, limit) {
       size += c.length;
       if (size > limit) {
         req.destroy();
-        reject(new HttpError(413, `Body too large (limit ${limit} bytes)`));
+        reject(new HttpError(413, `File or request body is too large (limit ${fmtLimit(limit)})`));
       } else chunks.push(c);
     });
     req.on('end', () => resolve(Buffer.concat(chunks)));

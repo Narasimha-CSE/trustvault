@@ -62,6 +62,9 @@ function requireDocument(ctx, docId, action, auditAction) {
       targetType: 'document', targetId: String(docId).slice(0, 64), ip: ctx.ip,
       details: { reason: r.reason, existed: !!r.doc },
     });
+    // No access at all -> 404 (indistinguishable from a missing document).
+    // Can already see it but not do THIS -> 403 (they know it exists, so nothing is leaked).
+    if (r.perm) throw new HttpError(403, 'You do not have permission to do that on this document');
     throw new HttpError(404, 'Document not found');
   }
   return r;

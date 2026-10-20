@@ -60,7 +60,7 @@ function sanitiseFilename(raw) {
 function validateUpload(rawName, buffer, maxBytes) {
   const name = sanitiseFilename(rawName);
   if (!buffer || buffer.length === 0) throw new HttpError(400, 'The file is empty');
-  if (buffer.length > maxBytes) throw new HttpError(413, `File exceeds the ${Math.round(maxBytes / 1024 / 1024)} MB limit`);
+  if (buffer.length > maxBytes) throw new HttpError(413, `File exceeds the ${maxBytes >= 1048576 ? Math.round(maxBytes / 1048576) + ' MB' : Math.round(maxBytes / 1024) + ' KB'} limit`);
   const dot = name.lastIndexOf('.');
   const ext = dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
   const type = TYPES[ext];

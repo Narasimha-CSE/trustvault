@@ -83,8 +83,7 @@ module.exports = function register(app) {
     if (!g || g.revoked_at) throw new HttpError(404, 'Grant not found');
     db.tx(() => {
       db.prepare('UPDATE grants SET revoked_at = ?, revoked_by = ? WHERE id = ?').run(cfg.now(), ctx.user.id, g.id);
-      const sessionsKept = true; // sessions are about identity; access is checked per request, so nothing else needs killing
-      audit.record({ actor: ctx.user, action: 'grant.revoke', outcome: 'allowed', targetType: 'document', targetId: docId, ip: ctx.ip, details: { grantId: g.id, grantee: g.grantee_id, permission: g.permission, byAdmin: actorIsAdmin, sessionsKept } });
+      audit.record({ actor: ctx.user, action: 'grant.revoke', outcome: 'allowed', targetType: 'document', targetId: docId, ip: ctx.ip, details: { grantId: g.id, grantee: g.grantee_id, permission: g.permission, byAdmin: actorIsAdmin } });
     });
   }
 
@@ -92,6 +91,17 @@ module.exports = function register(app) {
     const { doc } = requireDocument(ctx, ctx.params.id, 'share', 'grant.revoke');
     revoke(ctx, doc.id, uuid(ctx.params.grantId, 'grantId'), false);
     return { body: { ok: true } };
+  });
+
+  // "Who opened this, and when?" - the owner can see the trail for their own document, including refused attempts.
+  app.route('GET', '/api/documents/:id/activity', { roles: ['owner'] }, async (ctx) => {
+    const { doc } = requireDocument(ctx, ctx.params.id, 'share', 'document.activity');
+    const rows = db.prepare(
+      `SELECT ts, actor_email, action, outcome, ip, details FROM audit_log
+       WHERE target_type = 'document' AND target_id = ? AND action NOT IN ('document.activity','grant.list','ai.suggest')
+       ORDER BY seq DESC LIMIT 100`
+    ).all(doc.id);
+    return { body: { activity: rows.map((r) => ({ ts: r.ts, actor: r.actor_email, action: r.action, outcome: r.outcome, ip: r.ip, details: JSON.parse(r.details) })) } };
   });
 
   // ---------- AI assist: suggestions never grant anything ----------
