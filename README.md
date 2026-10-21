@@ -2,7 +2,7 @@
 
 **Built for the Snovasys Fresher Hiring Challenge 2026**
 
-**Live demo:** : https://trustvault-x5qb.onrender.com
+**Live Demo:** https://trustvault-x5qb.onrender.com
 
 **Demo Video:** [Watch the TrustVault Demo](https://drive.google.com/file/d/185Fcn_F8hm3ppjUvL6C-FMp82SkAyqpy/view?usp=drive_link)
 
