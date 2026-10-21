@@ -4,7 +4,7 @@
 
 **Live demo:** : https://trustvault-x5qb.onrender.com
 
-**Watch the TrustVault Demo Video: https://drive.google.com/file/d/185Fcn_F8hm3ppjUvL6C-FMp82SkAyqpy/view?usp=drive_link
+**Demo Video:** [Watch the TrustVault Demo](https://drive.google.com/file/d/185Fcn_F8hm3ppjUvL6C-FMp82SkAyqpy/view?usp=drive_link)
 
 
 TrustVault is a secure document-sharing platform designed to ensure that documents are accessible only to authorised users and that document activity can be investigated through an auditable record.
